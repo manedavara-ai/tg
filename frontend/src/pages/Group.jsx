@@ -45,6 +45,45 @@ export default function GroupPage() {
     }
   };
 
+  const handleOpenTelegram = (group) => {
+    try {
+      const invite = group.telegramInviteLink;
+      const chatId = group.telegramChatId;
+      const chatTitle = group.telegramChatTitle;
+
+      if (invite && typeof invite === 'string') {
+        if (invite.startsWith('https://t.me/')) {
+          window.open(invite, '_blank');
+          return;
+        }
+        if (invite.startsWith('tg://')) {
+          const message = `Open this link inside Telegram:\n\n${invite}\n\nSteps:\n1) Copy the link\n2) Open Telegram\n3) Paste in any chat\n4) Tap to join`;
+          alert(message);
+          return;
+        }
+      }
+
+      // Fallbacks if no invite link
+      if (chatTitle) {
+        // Try to open web telegram with title search
+        const encoded = encodeURIComponent(chatTitle);
+        window.open(`https://web.telegram.org/k/#@${encoded}`,'_blank');
+        return;
+      }
+
+      if (chatId) {
+        const message = `Telegram group/channel is linked but no invite link is available yet.\n\nChat ID: ${chatId}\n\nOpen Telegram and search the chat by title, or create an invite link.`;
+        alert(message);
+        return;
+      }
+
+      toast.error('No Telegram info available for this group');
+    } catch (e) {
+      console.error('Open Telegram failed', e);
+      toast.error('Failed to open Telegram link');
+    }
+  };
+
   const filteredGroups = groups.filter(group =>
     group.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
     group.telegramChatTitle?.toLowerCase().includes(searchQuery.toLowerCase())
@@ -187,6 +226,12 @@ export default function GroupPage() {
                         }`}
                       >
                         {group.isDefault ? 'Default' : 'Set Default'}
+                      </button>
+                      <button 
+                        onClick={() => handleOpenTelegram(group)}
+                        className="px-2 py-0.5 text-xs border rounded-md hover:bg-blue-100 dark:hover:bg-blue-900 border-blue-300 dark:border-blue-600 text-blue-700 dark:text-blue-300"
+                      >
+                        Open
                       </button>
                       <button 
                         onClick={() => handleDeleteGroup(group._id)}

@@ -27,6 +27,9 @@ const groupSchema = new mongoose.Schema({
   telegramChatTitle: {
     type: String
   },
+  telegramInviteLink: {
+    type: String
+  },
   botStatus: {
     type: String,
     enum: ['not_connected', 'connected', 'error'],
